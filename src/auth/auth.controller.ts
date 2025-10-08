@@ -9,6 +9,7 @@ import {
   HttpCode,
   HttpStatus,
   Query,
+  UnauthorizedException,
 } from '@nestjs/common';
 import type { Response, Request } from 'express';
 import { AuthService } from './auth.service';
@@ -16,6 +17,7 @@ import { SignupDto } from './dto/signup.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
+import { ResendVerificationDto } from './dto/resend-verification.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
@@ -34,6 +36,16 @@ interface RefreshPayloadUser extends JwtPayloadUser {
   refreshToken: string;
 }
 
+interface SigninResponse {
+  accessToken: string;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    emailVerified: boolean;
+  };
+}
+
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -48,16 +60,32 @@ export class AuthController {
     return this.authService.verifyEmail(query.userId, query.token);
   }
 
+  @Post('resend-verification')
+  @HttpCode(HttpStatus.OK)
+  async resendVerification(
+    @Body() resendVerificationDto: ResendVerificationDto,
+  ): Promise<{ message: string }> {
+    return this.authService.resendVerificationEmail(resendVerificationDto.email);
+  }
+
   @Post('signin')
   @UseGuards(AuthGuard('local'))
   @HttpCode(HttpStatus.OK)
   async signin(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
-  ): Promise<{ accessToken: string }> {
+  ): Promise<SigninResponse> {
     const user = req.user as UserDocument;
     if (!user) {
       throw new Error('User not found');
+    }
+
+    if (!user.isEmailVerified && !user.googleId) {
+      throw new UnauthorizedException({
+        message: 'Email не підтверджено. Перевірте вашу пошту.',
+        emailVerified: false,
+        email: user.email,
+      });
     }
 
     const tokens = await this.authService.signin(user);
@@ -69,7 +97,15 @@ export class AuthController {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    return { accessToken: tokens.accessToken };
+    return {
+      accessToken: tokens.accessToken,
+      user: {
+        id: user._id.toString(),
+        name: user.name || user.email.split('@')[0],
+        email: user.email,
+        emailVerified: user.isEmailVerified,
+      },
+    };
   }
 
   @Get('google')
