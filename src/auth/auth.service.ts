@@ -3,6 +3,7 @@ import {
   UnauthorizedException,
   BadRequestException,
   ForbiddenException,
+  NotFoundException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -59,6 +60,30 @@ export class AuthService {
     await this.tokensService.removeEmailVerificationToken(userId);
 
     return { message: 'Email verified successfully' };
+  }
+
+  async resendVerificationEmail(email: string): Promise<{ message: string }> {
+    const user = await this.usersService.findByEmail(email);
+
+    if (!user) {
+      throw new NotFoundException('Користувача з таким email не знайдено');
+    }
+
+    if (user.isEmailVerified) {
+      return { message: 'Email вже підтверджено' };
+    }
+
+    const verificationToken = await this.tokensService.createEmailVerificationToken(
+      user._id.toString(),
+    );
+
+    await this.mailService.sendEmailVerification(
+      user.email,
+      user._id.toString(),
+      verificationToken,
+    );
+
+    return { message: 'Лист підтвердження відправлено повторно' };
   }
 
   async validateUser(email: string, password: string): Promise<UserDocument | null> {
