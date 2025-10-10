@@ -1,6 +1,6 @@
-import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, VerifyCallback, Profile } from 'passport-google-oauth20';
 import { Injectable } from '@nestjs/common';
+import { PassportStrategy } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
 
 interface GoogleEmail {
@@ -15,10 +15,20 @@ interface GooglePhoto {
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   constructor(private readonly configService: ConfigService) {
+    const clientID = configService.get<string>('google.webClientId');
+    const clientSecret = configService.get<string>('google.clientSecret');
+    const callbackURL = configService.get<string>('google.callbackUrl');
+
+    if (!clientID || !clientSecret) {
+      throw new Error(
+        'Google OAuth configuration is missing. Check GOOGLE_WEB_CLIENT_ID and GOOGLE_CLIENT_SECRET',
+      );
+    }
+
     super({
-      clientID: configService.get<string>('google.clientId') || '',
-      clientSecret: configService.get<string>('google.clientSecret') || '',
-      callbackURL: configService.get<string>('google.callbackUrl') || '',
+      clientID,
+      clientSecret,
+      callbackURL,
       scope: ['email', 'profile'],
     });
   }

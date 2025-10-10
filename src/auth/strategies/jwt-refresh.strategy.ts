@@ -3,17 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { Request } from 'express';
-
-export interface JwtRefreshPayload {
-  sub: string;
-  email: string;
-}
-
-export interface JwtRefreshValidatedUser {
-  id: string;
-  email: string;
-  refreshToken: string;
-}
+import { JwtRefreshPayload, JwtRefreshValidatedUser } from '../interfaces/auth.interface';
 
 interface RequestWithCookies extends Request {
   cookies: {
