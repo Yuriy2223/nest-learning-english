@@ -13,21 +13,21 @@ import { UsersService } from 'src/user/user.service';
 import { TokensService } from 'src/token/token.service';
 import { UserDocument } from 'src/user/schemas/user.schema';
 import { GoogleUser } from 'src/user/interfaces/user.interface';
-
-export interface AuthTokens {
-  accessToken: string;
-  refreshToken: string;
-}
+import { OAuth2Client } from 'google-auth-library';
+import { AuthTokens } from './interfaces/auth.interface';
 
 @Injectable()
 export class AuthService {
+  private readonly googleClient: OAuth2Client;
   constructor(
     private readonly usersService: UsersService,
     private readonly tokensService: TokensService,
     private readonly mailService: MailService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
-  ) {}
+  ) {
+    this.googleClient = new OAuth2Client(this.configService.get<string>('google.clientId'));
+  }
 
   async signup(signupDto: SignupDto): Promise<{ message: string }> {
     const user = await this.usersService.create(
@@ -190,6 +190,44 @@ export class AuthService {
     await this.tokensService.removeResetPasswordToken(user._id.toString());
 
     return { message: 'Password reset successfully' };
+  }
+
+  async verifyGoogleToken(idToken: string): Promise<GoogleUser> {
+    try {
+      const webClientId = this.configService.get<string>('google.webClientId');
+      const androidClientId = this.configService.get<string>('google.androidClientId');
+      const audiences = [webClientId, androidClientId].filter((id): id is string => Boolean(id));
+      const ticket = await this.googleClient.verifyIdToken({
+        idToken,
+        audience: audiences.length > 0 ? audiences : undefined,
+      });
+
+      const payload = ticket.getPayload();
+
+      if (!payload || !payload.email) {
+        throw new UnauthorizedException('Invalid Google token');
+      }
+
+      return {
+        googleId: payload.sub,
+        email: payload.email,
+        name: payload.name || payload.email.split('@')[0],
+        avatar: payload.picture,
+      };
+    } catch (error) {
+      console.error('Google token verification error:', error);
+      throw new UnauthorizedException('Failed to verify Google token');
+    }
+  }
+
+  async getUserByEmail(email: string): Promise<UserDocument> {
+    const user = await this.usersService.findByEmail(email);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
   }
 
   private async generateTokens(user: UserDocument): Promise<AuthTokens> {

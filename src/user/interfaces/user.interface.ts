@@ -9,8 +9,8 @@ export interface User {
 }
 
 export interface GoogleUser {
+  googleId: string;
   email: string;
   name: string;
   avatar?: string;
-  googleId: string;
 }

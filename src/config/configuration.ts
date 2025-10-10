@@ -10,9 +10,10 @@ export default () => ({
     refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
   },
   google: {
-    clientId: process.env.GOOGLE_CLIENT_ID || '',
+    webClientId: process.env.GOOGLE_WEB_CLIENT_ID || '',
     clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
-    callbackUrl: process.env.GOOGLE_CALLBACK_URL || 'http://localhost:3000/auth/google/callback',
+    androidClientId: process.env.GOOGLE_ANDROID_CLIENT_ID || '',
+    callbackUrl: `${process.env.BACKEND_URL || 'http://localhost:3000'}/auth/google/callback`,
   },
   mail: {
     host: process.env.MAIL_HOST || 'smtp.gmail.com',
