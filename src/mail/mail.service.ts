@@ -21,7 +21,7 @@ export class MailService {
 
   async sendResetPasswordEmail(email: string, resetToken: string): Promise<void> {
     const backendUrl = this.configService.get<string>('backend.url');
-    const resetUrl = `${backendUrl}/api/auth/reset-redirect?token=${resetToken}`;
+    const resetUrl = `${backendUrl}/auth/reset-redirect?token=${resetToken}`;
 
     try {
       await this.transporter.sendMail({
@@ -197,7 +197,7 @@ export class MailService {
     verificationToken: string,
   ): Promise<void> {
     const backendUrl = this.configService.get<string>('backend.url');
-    const verificationUrl = `${backendUrl}/api/auth/verify-email?userId=${userId}&token=${verificationToken}`;
+    const verificationUrl = `${backendUrl}/auth/verify-email?userId=${userId}&token=${verificationToken}`;
 
     try {
       await this.transporter.sendMail({
