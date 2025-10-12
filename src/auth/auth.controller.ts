@@ -195,12 +195,8 @@ export class AuthController {
   resetRedirect(@Query('token') token: string, @Req() req: Request, @Res() res: Response): void {
     const userAgent = req.headers['user-agent'] || '';
     const isMobile = /Mobile|Android|iPhone|iPad/i.test(userAgent);
-
-    // const deepLink = `learningenglish://(auth)/reset-password?token=${token}`;
     const deepLink = `learningenglish://reset-password?token=${token}`;
-    // БЕЗ (auth)/
-    // const webUrl = `http://localhost:8081/reset-password?token=${token}`;
-    const webUrl = `http://localhost:8081/reset-password?token=${token}`;
+    const webUrl = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
 
     const html = `
       <!DOCTYPE html>
