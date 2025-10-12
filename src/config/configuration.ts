@@ -24,7 +24,6 @@ export default () => ({
   },
   frontend: {
     url: process.env.FRONTEND_URL || 'http://localhost:8081',
-    urls: ['http://localhost:8081', 'http://10.0.2.2:8081', 'http://192.168.0.45:8081'],
   },
   backend: {
     url: process.env.BACKEND_URL || 'http://localhost:3000',

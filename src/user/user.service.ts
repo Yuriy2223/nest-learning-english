@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from './schemas/user.schema';
 import * as bcrypt from 'bcrypt';
+import { UserDto } from './interfaces/user.interface';
 
 @Injectable()
 export class UsersService {
@@ -98,5 +99,61 @@ export class UsersService {
 
   async validatePassword(password: string, hashedPassword: string): Promise<boolean> {
     return bcrypt.compare(password, hashedPassword);
+  }
+
+  async findAll(): Promise<UserDto[]> {
+    const users = await this.userModel.find().exec();
+    return users.map((u) => ({
+      id: u._id.toString(),
+      email: u.email,
+      name: u.name,
+      avatar: u.avatar,
+      roles: u.roles,
+      googleId: u.googleId,
+      isEmailVerified: u.isEmailVerified,
+    }));
+  }
+
+  async updateProfile(
+    userId: string,
+    updateData: { name?: string; avatar?: string },
+  ): Promise<UserDto> {
+    const user = await this.userModel.findByIdAndUpdate(userId, updateData, { new: true }).exec();
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return {
+      id: user._id.toString(),
+      email: user.email,
+      name: user.name,
+      avatar: user.avatar,
+      roles: user.roles,
+      isEmailVerified: user.isEmailVerified,
+    };
+  }
+
+  async updateRoles(userId: string, roles: string[]): Promise<UserDto> {
+    const validRoles = ['user', 'admin', 'moderator'];
+    const invalidRoles = roles.filter((role) => !validRoles.includes(role));
+
+    if (invalidRoles.length > 0) {
+      throw new ConflictException(`Invalid roles: ${invalidRoles.join(', ')}`);
+    }
+
+    const user = await this.userModel.findByIdAndUpdate(userId, { roles }, { new: true }).exec();
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return {
+      id: user._id.toString(),
+      email: user.email,
+      name: user.name,
+      roles: user.roles,
+      isEmailVerified: user.isEmailVerified,
+    };
   }
 }

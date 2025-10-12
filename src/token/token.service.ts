@@ -25,7 +25,7 @@ export class TokensService {
   }
 
   async removeRefreshToken(userId: string): Promise<void> {
-    await this.tokenModel.findOneAndUpdate({ userId }, { $unset: { refreshToken: '' } }).exec();
+    await this.tokenModel.findOneAndUpdate({ userId }, { refreshToken: null }).exec();
   }
 
   async createResetPasswordToken(userId: string): Promise<string> {
