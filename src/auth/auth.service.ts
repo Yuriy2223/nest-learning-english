@@ -187,6 +187,11 @@ export class AuthService {
     }
 
     await this.usersService.updatePassword(user._id.toString(), newPassword);
+
+    if (!user.isEmailVerified) {
+      await this.usersService.verifyEmail(user._id.toString());
+    }
+
     await this.tokensService.removeResetPasswordToken(user._id.toString());
 
     return { message: 'Password reset successfully' };

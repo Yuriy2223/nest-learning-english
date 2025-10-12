@@ -1,4 +1,4 @@
-export interface User {
+export interface UserDto {
   id: string;
   email: string;
   roles: string[];
@@ -13,4 +13,13 @@ export interface GoogleUser {
   email: string;
   name: string;
   avatar?: string;
+}
+
+export interface UserPublicDto {
+  id: string;
+  email: string;
+  name?: string;
+  avatar?: string;
+  googleId?: string;
+  isEmailVerified?: boolean;
 }

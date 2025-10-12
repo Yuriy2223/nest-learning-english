@@ -10,6 +10,7 @@ export interface RefreshPayloadUser extends JwtPayloadUser {
 
 export interface SigninResponse {
   accessToken: string;
+  refreshToken?: string;
   user: {
     id: string;
     name: string;
