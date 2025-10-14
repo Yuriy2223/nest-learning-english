@@ -9,6 +9,7 @@ import { TokensModule } from './token/token.module';
 import { MailModule } from './mail/mail.module';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { VocabularyModule } from './vocabulary/vocabulary.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
     UsersModule,
     TokensModule,
     MailModule,
+    VocabularyModule,
   ],
   providers: [
     {
