@@ -1,10 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
-export type TopicType = 'vocabulary' | 'phrases' | 'grammar';
 export type TopicDifficulty = 'beginner' | 'intermediate' | 'advanced';
 
-@Schema({ timestamps: true })
+@Schema({ collection: 'vocabulary_topics', timestamps: true })
 export class Topic extends Document {
   @Prop({ required: true })
   title: string;
@@ -14,13 +13,6 @@ export class Topic extends Document {
 
   @Prop()
   imageUrl: string;
-
-  @Prop({
-    type: String,
-    enum: ['vocabulary', 'phrases', 'grammar'],
-    required: true,
-  })
-  type: TopicType;
 
   @Prop({
     type: String,

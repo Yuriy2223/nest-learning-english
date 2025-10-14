@@ -13,10 +13,6 @@ export class CreateTopicDto {
   @IsOptional()
   imageUrl?: string;
 
-  @IsEnum(['vocabulary', 'phrases', 'grammar'])
-  @IsNotEmpty()
-  type: 'vocabulary' | 'phrases' | 'grammar';
-
   @IsEnum(['beginner', 'intermediate', 'advanced'])
   @IsNotEmpty()
   difficulty: 'beginner' | 'intermediate' | 'advanced';

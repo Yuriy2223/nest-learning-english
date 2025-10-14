@@ -3,7 +3,6 @@ export interface TopicLean {
   title: string;
   description: string;
   imageUrl?: string;
-  type: 'vocabulary' | 'phrases' | 'grammar';
   difficulty: 'beginner' | 'intermediate' | 'advanced';
   createdAt: Date;
   updatedAt: Date;
@@ -59,6 +58,5 @@ export interface TopicResponse {
   imageUrl?: string;
   totalItems: number;
   completedItems: number;
-  type: 'vocabulary' | 'phrases' | 'grammar';
   difficulty: 'beginner' | 'intermediate' | 'advanced';
 }

@@ -58,7 +58,6 @@ export class VocabularyService {
           imageUrl: topic.imageUrl,
           totalItems,
           completedItems,
-          type: topic.type,
           difficulty: topic.difficulty,
         };
       }),
@@ -80,7 +79,7 @@ export class VocabularyService {
 
     const words = await this.wordModel
       .find({ topicId: new Types.ObjectId(topicId) })
-      .select('word translation transcription audioUrl')
+      // .select('word translation transcription audioUrl')
       .lean<WordLean[]>();
 
     const wordIds = words.map((w) => new Types.ObjectId(w._id));
@@ -156,7 +155,6 @@ export class VocabularyService {
       imageUrl: topic.imageUrl,
       totalItems: 0,
       completedItems: 0,
-      type: topic.type,
       difficulty: topic.difficulty,
     };
   }
@@ -183,7 +181,6 @@ export class VocabularyService {
       imageUrl: topic.imageUrl,
       totalItems,
       completedItems: 0,
-      type: topic.type,
       difficulty: topic.difficulty,
     };
   }
@@ -327,7 +324,6 @@ export class VocabularyService {
           imageUrl: topic.imageUrl,
           totalItems,
           completedItems: 0,
-          type: topic.type,
           difficulty: topic.difficulty,
         };
       }),
