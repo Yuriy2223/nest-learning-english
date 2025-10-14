@@ -1,33 +1,3 @@
-// import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-// import { Document } from 'mongoose';
-
-// @Schema({ timestamps: true })
-// export class Topic extends Document {
-//   @Prop({ required: true })
-//   title: string;
-
-//   @Prop({ required: true })
-//   description: string;
-
-//   @Prop()
-//   imageUrl: string;
-
-//   @Prop({
-//     type: String,
-//     enum: ['vocabulary', 'phrases', 'grammar'],
-//     required: true,
-//   })
-//   type: string;
-
-//   @Prop({
-//     type: String,
-//     enum: ['beginner', 'intermediate', 'advanced'],
-//     required: true,
-//   })
-//   difficulty: string;
-// }
-
-// export const TopicSchema = SchemaFactory.createForClass(Topic);
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
