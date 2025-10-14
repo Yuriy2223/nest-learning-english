@@ -55,7 +55,7 @@ export class VocabularyService {
           id: topic._id,
           title: topic.title,
           description: topic.description,
-          imageUrl: topic.imageUrl || null,
+          imageUrl: topic.imageUrl,
           totalItems,
           completedItems,
           type: topic.type,
@@ -150,11 +150,10 @@ export class VocabularyService {
     const topic = await this.topicModel.create(createTopicDto);
 
     return {
-      // id: topic._id,
       id: String(topic._id),
       title: topic.title,
       description: topic.description,
-      imageUrl: topic.imageUrl || null,
+      imageUrl: topic.imageUrl,
       totalItems: 0,
       completedItems: 0,
       type: topic.type,
@@ -178,11 +177,10 @@ export class VocabularyService {
     });
 
     return {
-      // id: topic._id,
       id: String(topic._id),
       title: topic.title,
       description: topic.description,
-      imageUrl: topic.imageUrl || null,
+      imageUrl: topic.imageUrl,
       totalItems,
       completedItems: 0,
       type: topic.type,
@@ -234,7 +232,6 @@ export class VocabularyService {
     });
 
     return {
-      // id: word._id,
       id: String(word._id),
       word: word.word,
       translation: word.translation,
@@ -285,7 +282,6 @@ export class VocabularyService {
     }
 
     return {
-      // id: word._id,
       id: String(word._id),
       word: word.word,
       translation: word.translation,
@@ -328,7 +324,7 @@ export class VocabularyService {
           id: topic._id,
           title: topic.title,
           description: topic.description,
-          imageUrl: topic.imageUrl || null,
+          imageUrl: topic.imageUrl,
           totalItems,
           completedItems: 0,
           type: topic.type,
