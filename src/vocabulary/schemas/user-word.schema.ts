@@ -1,12 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
-@Schema({ timestamps: true })
+@Schema({ collection: 'user_vocabulary_words', timestamps: true })
 export class UserWord extends Document {
-  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
+  @Prop({ type: Types.ObjectId, ref: 'Users', required: true })
   userId: Types.ObjectId;
 
-  @Prop({ type: Types.ObjectId, ref: 'Word', required: true })
+  @Prop({ type: Types.ObjectId, ref: 'vocabulary_words', required: true })
   wordId: Types.ObjectId;
 
   @Prop({ default: false })
