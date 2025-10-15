@@ -49,7 +49,6 @@ export class VocabularyService {
         });
 
         return {
-          // id: topic._id,
           id: String(topic._id),
           title: topic.title,
           description: topic.description,
