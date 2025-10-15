@@ -4,6 +4,10 @@ import { Model, Types } from 'mongoose';
 import { Topic } from './schemas/topic.schema';
 import { Word } from './schemas/word.schema';
 import { UserWord } from './schemas/user-word.schema';
+import { CreateTopicDto } from './dto/create-topic.dto';
+import { UpdateTopicDto } from './dto/update-topic.dto';
+import { UpdateWordDto } from './dto/update-word.dto';
+import { CreateWordDto } from './dto/create-word.dto';
 import {
   TopicLean,
   WordLean,
@@ -13,10 +17,6 @@ import {
   WordResponse,
   WordStatusResponse,
 } from './interfaces/vocabulary.interface';
-import { CreateTopicDto } from './dto/create-topic.dto';
-import { UpdateTopicDto } from './dto/update-topic.dto';
-import { CreateWordDto } from './dto/create-word.dto';
-import { UpdateWordDto } from './dto/update-word.dto';
 
 @Injectable()
 export class VocabularyService {
@@ -30,10 +30,7 @@ export class VocabularyService {
   ) {}
 
   async getTopics(userId: string): Promise<TopicResponse[]> {
-    const topics = await this.topicModel
-      .find()
-      .select('title description imageUrl difficulty type')
-      .lean<TopicLean[]>();
+    const topics = await this.topicModel.find().lean<TopicLean[]>();
 
     const topicsWithProgress = await Promise.all(
       topics.map(async (topic): Promise<TopicResponse> => {
@@ -52,7 +49,8 @@ export class VocabularyService {
         });
 
         return {
-          id: topic._id,
+          // id: topic._id,
+          id: String(topic._id),
           title: topic.title,
           description: topic.description,
           imageUrl: topic.imageUrl,
@@ -79,7 +77,6 @@ export class VocabularyService {
 
     const words = await this.wordModel
       .find({ topicId: new Types.ObjectId(topicId) })
-      // .select('word translation transcription audioUrl')
       .lean<WordLean[]>();
 
     const wordIds = words.map((w) => new Types.ObjectId(w._id));
@@ -91,11 +88,13 @@ export class VocabularyService {
       })
       .lean<UserWordLean[]>();
 
-    const userWordsMap = new Map<string, boolean>(userWords.map((uw) => [uw.wordId, uw.isKnown]));
+    const userWordsMap = new Map<string, boolean>(
+      userWords.map((uw) => [String(uw.wordId), uw.isKnown]),
+    );
 
     return words.map(
       (word): WordResponse => ({
-        id: word._id,
+        id: String(word._id),
         word: word.word,
         translation: word.translation,
         transcription: word.transcription,
@@ -318,7 +317,7 @@ export class VocabularyService {
         });
 
         return {
-          id: topic._id,
+          id: String(topic._id),
           title: topic.title,
           description: topic.description,
           imageUrl: topic.imageUrl,
