@@ -11,6 +11,7 @@ import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { VocabularyModule } from './vocabulary/vocabulary.module';
 import { PhrasesModule } from './phrases/phrases.module';
+import { GrammarModule } from './grammar/grammar.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { PhrasesModule } from './phrases/phrases.module';
     MailModule,
     VocabularyModule,
     PhrasesModule,
+    GrammarModule,
   ],
   providers: [
     {
