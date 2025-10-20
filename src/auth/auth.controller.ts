@@ -29,13 +29,9 @@ import { GoogleIdTokenDto } from './dto/google-id-token.dto';
 import type {
   JwtPayloadUser,
   JwtRefreshValidatedUser,
-  // RefreshPayloadUser,
   SigninResponse,
 } from './interfaces/auth.interface';
 
-// @Controller('auth')
-// export class AuthController {
-//   constructor(private readonly authService: AuthService) {}
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -67,45 +63,6 @@ export class AuthController {
     return this.authService.resendVerificationEmail(resendVerificationDto.email);
   }
 
-  // @Post('signin')
-  // @UseGuards(AuthGuard('local'))
-  // @HttpCode(HttpStatus.OK)
-  // async signin(
-  //   @Req() req: Request,
-  //   @Res({ passthrough: true }) res: Response,
-  // ): Promise<SigninResponse> {
-  //   const user = req.user as UserDocument;
-  //   if (!user) {
-  //     throw new Error('User not found');
-  //   }
-
-  //   if (!user.isEmailVerified && !user.googleId) {
-  //     throw new UnauthorizedException({
-  //       message: 'Email не підтверджено. Перевірте вашу пошту.',
-  //       emailVerified: false,
-  //       email: user.email,
-  //     });
-  //   }
-
-  //   const tokens = await this.authService.signin(user);
-
-  //   res.cookie('refreshToken', tokens.refreshToken, {
-  //     httpOnly: true,
-  //     secure: process.env.NODE_ENV === 'production',
-  //     sameSite: 'strict',
-  //     maxAge: 7 * 24 * 60 * 60 * 1000,
-  //   });
-
-  //   return {
-  //     accessToken: tokens.accessToken,
-  //     user: {
-  //       id: user._id.toString(),
-  //       name: user.name || user.email.split('@')[0],
-  //       email: user.email,
-  //       emailVerified: user.isEmailVerified,
-  //     },
-  //   };
-  // }
   @Post('signin')
   @UseGuards(AuthGuard('local'))
   @HttpCode(HttpStatus.OK)
@@ -179,29 +136,6 @@ export class AuthController {
     }
   }
 
-  // @Post('google')
-  // @HttpCode(HttpStatus.OK)
-  // async googleAuthMobile(
-  //   @Body() googleIdTokenDto: GoogleIdTokenDto,
-  //   @Res({ passthrough: true }) res: Response,
-  // ): Promise<SigninResponse> {
-  //   const googleUser = await this.authService.verifyGoogleToken(googleIdTokenDto.idToken);
-  //   const tokens = await this.authService.googleLogin(googleUser);
-
-  //   this.setRefreshTokenCookie(res, tokens.refreshToken);
-
-  //   const user = await this.authService.getUserByEmail(googleUser.email);
-
-  //   return {
-  //     accessToken: tokens.accessToken,
-  //     user: {
-  //       id: user._id.toString(),
-  //       name: user.name || user.email.split('@')[0],
-  //       email: user.email,
-  //       emailVerified: true,
-  //     },
-  //   };
-  // }
   @Post('google')
   @HttpCode(HttpStatus.OK)
   async googleAuthMobile(
@@ -241,24 +175,6 @@ export class AuthController {
     };
   }
 
-  // @Post('refresh')
-  // @UseGuards(JwtRefreshGuard)
-  // @HttpCode(HttpStatus.OK)
-  // async refresh(
-  //   @CurrentUser() user: RefreshPayloadUser,
-  //   @Res({ passthrough: true }) res: Response,
-  // ): Promise<{ accessToken: string }> {
-  //   const tokens = await this.authService.refresh(user.id, user.refreshToken);
-
-  //   res.cookie('refreshToken', tokens.refreshToken, {
-  //     httpOnly: true,
-  //     secure: process.env.NODE_ENV === 'production',
-  //     sameSite: 'strict',
-  //     maxAge: 7 * 24 * 60 * 60 * 1000,
-  //   });
-
-  //   return { accessToken: tokens.accessToken };
-  // }
   @Post('refresh')
   @UseGuards(JwtRefreshGuard)
   @HttpCode(HttpStatus.OK)
@@ -284,19 +200,6 @@ export class AuthController {
     };
   }
 
-  // @Post('logout')
-  // @UseGuards(JwtAuthGuard)
-  // @HttpCode(HttpStatus.OK)
-  // async logout(
-  //   @CurrentUser() user: JwtPayloadUser,
-  //   @Res({ passthrough: true }) res: Response,
-  // ): Promise<{ message: string }> {
-  //   await this.authService.logout(user.id);
-
-  //   res.clearCookie('refreshToken');
-
-  //   return { message: 'Logged out successfully' };
-  // }
   @Post('logout')
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
