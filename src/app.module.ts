@@ -12,6 +12,7 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { VocabularyModule } from './vocabulary/vocabulary.module';
 import { PhrasesModule } from './phrases/phrases.module';
 import { GrammarModule } from './grammar/grammar.module';
+import { ExercisesModule } from './exercises/exercises.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { GrammarModule } from './grammar/grammar.module';
     VocabularyModule,
     PhrasesModule,
     GrammarModule,
+    ExercisesModule,
   ],
   providers: [
     {
