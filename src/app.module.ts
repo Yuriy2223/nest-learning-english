@@ -13,6 +13,7 @@ import { VocabularyModule } from './vocabulary/vocabulary.module';
 import { PhrasesModule } from './phrases/phrases.module';
 import { GrammarModule } from './grammar/grammar.module';
 import { ExercisesModule } from './exercises/exercises.module';
+import { AchievementsModule } from './achievements/achievements.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { ExercisesModule } from './exercises/exercises.module';
     PhrasesModule,
     GrammarModule,
     ExercisesModule,
+    AchievementsModule,
   ],
   providers: [
     {
