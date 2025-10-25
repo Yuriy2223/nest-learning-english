@@ -8,7 +8,6 @@ import { UserDto } from './interfaces/user.interface';
 @Injectable()
 export class UsersService {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
-
   async create(email: string, password: string, name?: string): Promise<UserDocument> {
     const existingUser = await this.userModel.findOne({ email });
     if (existingUser) {
@@ -155,5 +154,87 @@ export class UsersService {
       roles: user.roles,
       isEmailVerified: user.isEmailVerified,
     };
+  }
+
+  async updateStudyTime(userId: string, seconds: number): Promise<UserDocument> {
+    await this.updateStreak(userId);
+    const user = await this.userModel.findByIdAndUpdate(
+      userId,
+      {
+        $inc: { totalStudySeconds: seconds },
+        lastActiveAt: new Date(),
+      },
+      { new: true },
+    );
+
+    if (!user) {
+      throw new NotFoundException('Користувача не знайдено');
+    }
+
+    return user;
+  }
+
+  async updateStreak(userId: string): Promise<void> {
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new NotFoundException('Користувача не знайдено');
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (!user.lastStreakDate) {
+      user.streak = 1;
+      user.lastStreakDate = today;
+    } else {
+      const lastDate = new Date(user.lastStreakDate);
+      lastDate.setHours(0, 0, 0, 0);
+
+      const diffDays = Math.floor((today.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24));
+
+      if (diffDays === 0) {
+        return;
+      } else if (diffDays === 1) {
+        user.streak += 1;
+        user.lastStreakDate = today;
+      } else {
+        user.streak = 1;
+        user.lastStreakDate = today;
+      }
+    }
+
+    await user.save();
+  }
+
+  async resetProgress(userId: string): Promise<{ success: boolean; message: string }> {
+    try {
+      const user = await this.userModel
+        .findByIdAndUpdate(
+          userId,
+          {
+            points: 0,
+            streak: 0,
+            lastStreakDate: null,
+            totalStudySeconds: 0,
+          },
+          { new: true },
+        )
+        .exec();
+
+      if (!user) {
+        throw new NotFoundException('Користувача не знайдено');
+      }
+
+      return {
+        success: true,
+        message: 'Прогрес успішно скинуто',
+      };
+    } catch (err: unknown) {
+      console.error('Reset progress error:', err);
+      const error = err as Error;
+      throw new NotFoundException(
+        `Помилка скидання прогресу: ${error.message || 'Невідома помилка'}`,
+      );
+    }
   }
 }

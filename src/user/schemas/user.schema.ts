@@ -28,6 +28,18 @@ export class User {
   @Prop({ default: false })
   isEmailVerified: boolean;
 
+  @Prop({ default: 0 })
+  totalStudySeconds: number;
+
+  @Prop({ default: 0 })
+  points: number;
+
+  @Prop({ default: 0 })
+  streak: number;
+
+  @Prop()
+  lastStreakDate?: Date;
+
   createdAt: Date;
   updatedAt: Date;
 }

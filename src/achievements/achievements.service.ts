@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Achievement } from './schemas/achievement.schema';
 import { UserAchievement } from './schemas/user-achievement.schema';
+import { User } from '../user/schemas/user.schema';
 import { CreateAchievementDto } from './dto/create-achievement.dto';
 import { UpdateAchievementDto } from './dto/update-achievement.dto';
 import {
@@ -28,7 +29,7 @@ export class AchievementsService {
     private userExerciseModel: Model<any>,
     @InjectModel('UserGrammarTest')
     private userGrammarTestModel: Model<any>,
-    @InjectModel('User')
+    @InjectModel(User.name)
     private userModel: Model<any>,
   ) {}
 
@@ -352,5 +353,16 @@ export class AchievementsService {
     return {
       message: `Досягнення "${achievement.title}" успішно видалено`,
     };
+  }
+
+  async resetUserAchievements(userId: string): Promise<void> {
+    const userObjectId = new Types.ObjectId(userId);
+    await this.userAchievementModel.deleteMany({ userId: userObjectId });
+    await Promise.all([
+      this.userWordModel.deleteMany({ userId: userObjectId }),
+      this.userPhraseModel.deleteMany({ userId: userObjectId }),
+      this.userExerciseModel.deleteMany({ userId: userObjectId }),
+      this.userGrammarTestModel.deleteMany({ userId: userObjectId }),
+    ]);
   }
 }
