@@ -6,6 +6,9 @@ export interface UserDto {
   avatar?: string;
   googleId?: string;
   isEmailVerified?: boolean;
+  totalStudySeconds?: number;
+  streak?: number;
+  points?: number;
 }
 
 export interface GoogleUser {
@@ -22,4 +25,7 @@ export interface UserPublicDto {
   avatar?: string;
   googleId?: string;
   isEmailVerified?: boolean;
+  totalStudySeconds?: number;
+  streak?: number;
+  points?: number;
 }

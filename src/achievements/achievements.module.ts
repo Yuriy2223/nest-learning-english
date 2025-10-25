@@ -1,9 +1,9 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AchievementsController } from './achievements.controller';
 import { AchievementsService } from './achievements.service';
-import { User, UserSchema } from '../user/schemas/user.schema';
-import { UserWord, UserWordSchema } from 'src/vocabulary/schemas/user-word.schema';
+import { UsersModule } from '../user/user.module';
+import { UserWord, UserWordSchema } from '../vocabulary/schemas/user-word.schema';
 import { Achievement, AchievementSchema } from './schemas/achievement.schema';
 import { UserAchievement, UserAchievementSchema } from './schemas/user-achievement.schema';
 import { UserPhrase, UserPhraseSchema } from '../phrases/schemas/user-phrases.schema';
@@ -22,8 +22,8 @@ import {
       { name: UserPhrase.name, schema: UserPhraseSchema },
       { name: UserExercise.name, schema: UserExerciseSchema },
       { name: UserGrammarTest.name, schema: UserGrammarTestSchema },
-      { name: User.name, schema: UserSchema },
     ]),
+    forwardRef(() => UsersModule),
   ],
   controllers: [AchievementsController],
   providers: [AchievementsService],
