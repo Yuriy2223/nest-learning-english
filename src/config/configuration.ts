@@ -22,6 +22,9 @@ export default () => ({
     password: process.env.MAIL_PASSWORD || '',
     from: process.env.MAIL_FROM || 'noreply@example.com',
   },
+  admin: {
+    url: process.env.ADMIN_URL || 'http://localhost:5173',
+  },
   frontend: {
     url: process.env.FRONTEND_URL || 'http://localhost:8081',
   },

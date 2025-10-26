@@ -5,6 +5,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Param,
   Patch,
   Post,
   UseGuards,
@@ -35,6 +36,30 @@ export class UsersController {
       name: fullUser.name,
       avatar: fullUser.avatar,
       totalStudySeconds: fullUser.totalStudySeconds,
+      roles: fullUser.roles,
+    };
+  }
+
+  @Get('all')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
+  async getAllUsers(): Promise<UserDto[]> {
+    return this.usersService.findAll();
+  }
+
+  @Get(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
+  async getUserById(@Param('id') id: string): Promise<UserDto> {
+    const user = await this.usersService.findById(id);
+    return {
+      id: user._id.toString(),
+      email: user.email,
+      name: user.name,
+      avatar: user.avatar,
+      roles: user.roles,
+      isEmailVerified: user.isEmailVerified,
+      googleId: user.googleId,
     };
   }
 
@@ -74,13 +99,6 @@ export class UsersController {
   async resetProgress(@CurrentUser() user: UserDto) {
     await this.achievementsService.resetUserAchievements(user.id);
     return this.usersService.resetProgress(user.id);
-  }
-
-  @Get('all')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin')
-  async getAllUsers(): Promise<UserDto[]> {
-    return this.usersService.findAll();
   }
 
   @Patch(':id/roles')

@@ -47,6 +47,13 @@ export class VocabularyController {
     return this.vocabularyService.updateWordStatus(wordId, user.id, updateWordStatusDto.isKnown);
   }
 
+  @Get('admin/topics/:topicId/words')
+  @UseGuards(RolesGuard)
+  @Roles('admin')
+  async getAllWordsAdmin(@Param('topicId') topicId: string) {
+    return this.vocabularyService.getAllWordsAdmin(topicId);
+  }
+
   @Get('admin/topics')
   @UseGuards(RolesGuard)
   @Roles('admin')
@@ -75,13 +82,6 @@ export class VocabularyController {
   @HttpCode(HttpStatus.OK)
   async deleteTopic(@Param('topicId') topicId: string) {
     return this.vocabularyService.deleteTopic(topicId);
-  }
-
-  @Get('admin/topics/:topicId/words')
-  @UseGuards(RolesGuard)
-  @Roles('admin')
-  async getAllWordsAdmin(@Param('topicId') topicId: string) {
-    return this.vocabularyService.getAllWordsAdmin(topicId);
   }
 
   @Post('admin/words')

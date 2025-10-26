@@ -16,6 +16,7 @@ export interface SigninResponse {
     name: string;
     email: string;
     emailVerified: boolean;
+    roles: string[];
   };
 }
 
