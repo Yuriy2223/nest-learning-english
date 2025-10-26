@@ -96,6 +96,7 @@ export class AuthController {
           name: user.name || user.email.split('@')[0],
           email: user.email,
           emailVerified: user.isEmailVerified,
+          roles: user.roles,
         },
       };
     }
@@ -108,6 +109,7 @@ export class AuthController {
         name: user.name || user.email.split('@')[0],
         email: user.email,
         emailVerified: user.isEmailVerified,
+        roles: user.roles,
       },
     };
   }
@@ -159,6 +161,7 @@ export class AuthController {
           name: user.name || user.email.split('@')[0],
           email: user.email,
           emailVerified: true,
+          roles: user.roles,
         },
       };
     }
@@ -171,6 +174,7 @@ export class AuthController {
         name: user.name || user.email.split('@')[0],
         email: user.email,
         emailVerified: true,
+        roles: user.roles,
       },
     };
   }

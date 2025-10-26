@@ -12,7 +12,10 @@ async function bootstrap(): Promise<void> {
   app.use(helmet());
   app.use(cookieParser());
   app.enableCors({
-    origin: configService.get<string>('frontend.url'),
+    origin: [
+      configService.get<string>('frontend.url'),
+      configService.get<string>('admin.url'),
+    ].filter(Boolean),
     credentials: true,
   });
   app.useGlobalPipes(

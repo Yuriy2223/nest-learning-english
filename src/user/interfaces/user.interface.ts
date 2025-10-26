@@ -26,6 +26,7 @@ export interface UserPublicDto {
   googleId?: string;
   isEmailVerified?: boolean;
   totalStudySeconds?: number;
+  roles: string[];
   streak?: number;
   points?: number;
 }
