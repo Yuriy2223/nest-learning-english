@@ -9,6 +9,7 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -73,8 +74,10 @@ export class GrammarController {
   @Get('admin/topics')
   @UseGuards(RolesGuard)
   @Roles('admin')
-  async getAllTopicsAdmin() {
-    return this.grammarService.getAllTopicsAdmin();
+  // async getAllTopicsAdmin() {
+  //   return this.grammarService.getAllTopicsAdmin();
+  async getAllTopicsAdmin(@Query('q') q?: string) {
+    return this.grammarService.getAllTopicsAdmin(q);
   }
 
   @Post('admin/topics')
@@ -146,6 +149,16 @@ export class GrammarController {
   @HttpCode(HttpStatus.CREATED)
   async createQuestion(@Body() createQuestionDto: CreateGrammarQuestionDto) {
     return this.grammarService.createQuestion(createQuestionDto);
+  }
+
+  @Patch('admin/questions/:questionId')
+  @UseGuards(RolesGuard)
+  @Roles('admin')
+  async updateQuestion(
+    @Param('questionId') questionId: string,
+    @Body() updateQuestionDto: CreateGrammarQuestionDto,
+  ) {
+    return this.grammarService.updateQuestion(questionId, updateQuestionDto);
   }
 
   @Delete('admin/questions/:questionId')
