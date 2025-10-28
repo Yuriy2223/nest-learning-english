@@ -74,8 +74,6 @@ export class GrammarController {
   @Get('admin/topics')
   @UseGuards(RolesGuard)
   @Roles('admin')
-  // async getAllTopicsAdmin() {
-  //   return this.grammarService.getAllTopicsAdmin();
   async getAllTopicsAdmin(@Query('q') q?: string) {
     return this.grammarService.getAllTopicsAdmin(q);
   }
