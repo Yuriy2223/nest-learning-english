@@ -360,8 +360,15 @@ export class GrammarService {
     };
   }
 
-  async getAllTopicsAdmin(): Promise<GrammarTopicResponse[]> {
-    const topics = await this.grammarTopicModel.find().lean<GrammarTopicLean[]>();
+  async getAllTopicsAdmin(q?: string): Promise<GrammarTopicResponse[]> {
+    const filter: Record<string, any> = {};
+
+    if (q) {
+      filter.title = { $regex: q, $options: 'i' };
+    }
+
+    const topics = await this.grammarTopicModel.find(filter).lean<GrammarTopicLean[]>();
+
     const topicsWithCounts = await Promise.all(
       topics.map(async (topic): Promise<GrammarTopicResponse> => {
         const totalItems = await this.grammarRuleModel.countDocuments({
@@ -512,6 +519,43 @@ export class GrammarService {
     });
 
     return { message: 'Питання успішно створено' };
+  }
+
+  async updateQuestion(
+    questionId: string,
+    updateQuestionDto: CreateGrammarQuestionDto,
+  ): Promise<GrammarQuestionLean> {
+    if (!Types.ObjectId.isValid(questionId)) {
+      throw new NotFoundException(`Невірний ID питання`);
+    }
+
+    const { topicId, ...questionData } = updateQuestionDto;
+
+    if (!Types.ObjectId.isValid(topicId)) {
+      throw new NotFoundException(`Невірний ID теми`);
+    }
+
+    const topic = await this.grammarTopicModel.findById(topicId);
+    if (!topic) {
+      throw new NotFoundException(`Тема з ID ${topicId} не знайдена`);
+    }
+
+    const question = await this.grammarQuestionModel
+      .findByIdAndUpdate(
+        questionId,
+        {
+          ...questionData,
+          topicId: new Types.ObjectId(topicId),
+        },
+        { new: true },
+      )
+      .lean<GrammarQuestionLean>();
+
+    if (!question) {
+      throw new NotFoundException(`Питання з ID ${questionId} не знайдено`);
+    }
+
+    return question;
   }
 
   async getTopicQuestionsAdmin(topicId: string): Promise<GrammarQuestionLean[]> {
