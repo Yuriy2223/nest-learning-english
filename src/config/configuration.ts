@@ -12,7 +12,7 @@ export default () => ({
   google: {
     webClientId: process.env.GOOGLE_WEB_CLIENT_ID || '',
     clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
-    androidClientId: process.env.GOOGLE_ANDROID_CLIENT_ID || '',
+    // androidClientId: process.env.GOOGLE_ANDROID_CLIENT_ID || '',
     callbackUrl: `${process.env.BACKEND_URL || 'http://localhost:3000'}/auth/google/callback`,
   },
   mail: {
