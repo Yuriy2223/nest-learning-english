@@ -31,10 +31,14 @@ import type {
   JwtRefreshValidatedUser,
   SigninResponse,
 } from './interfaces/auth.interface';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly configService: ConfigService,
+  ) {}
 
   private isMobileApp(req: Request): boolean {
     const platform = req.headers['x-platform'] || req.headers['x-app-platform'];
@@ -148,7 +152,6 @@ export class AuthController {
     const googleUser = await this.authService.verifyGoogleToken(googleIdTokenDto.idToken);
     const tokens = await this.authService.googleLogin(googleUser);
     const isMobile = this.isMobileApp(req);
-
     const user = await this.authService.getUserByEmail(googleUser.email);
 
     if (!isMobile) {
@@ -243,7 +246,9 @@ export class AuthController {
     const userAgent = req.headers['user-agent'] || '';
     const isMobile = /Mobile|Android|iPhone|iPad/i.test(userAgent);
     const deepLink = `learningenglish://reset-password?token=${token}`;
-    const webUrl = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
+    // const webUrl = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
+    const frontendUrl = this.configService.get<string>('frontend.url');
+    const webUrl = `${frontendUrl}/reset-password?token=${token}`;
 
     const html = `
   <!DOCTYPE html>
