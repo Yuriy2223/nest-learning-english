@@ -111,33 +111,6 @@ export class AuthService {
     return tokens;
   }
 
-  // async googleLogin(googleUser: GoogleUser): Promise<AuthTokens> {
-  //   let user = await this.usersService.findByGoogleId(googleUser.googleId);
-
-  //   if (!user) {
-  //     user = await this.usersService.findByEmail(googleUser.email);
-  //     if (user) {
-  //       user = await this.usersService.updateGoogleUser(
-  //         user._id.toString(),
-  //         googleUser.googleId,
-  //         googleUser.name,
-  //         googleUser.avatar,
-  //       );
-  //     } else {
-  //       user = await this.usersService.createGoogleUser(
-  //         googleUser.email,
-  //         googleUser.googleId,
-  //         googleUser.name,
-  //         googleUser.avatar,
-  //       );
-  //     }
-  //   }
-
-  //   const tokens = await this.generateTokens(user);
-  //   await this.tokensService.saveRefreshToken(user._id.toString(), tokens.refreshToken);
-  //   return tokens;
-  // }
-
   async googleLogin(googleUser: GoogleUser): Promise<AuthTokens> {
     const userWithState = googleUser as GoogleUser & { state?: string };
     const isAdmin = userWithState.state === 'admin';
@@ -169,7 +142,7 @@ export class AuthService {
     }
 
     if (isAdmin && !user.roles.includes('admin')) {
-      throw new UnauthorizedException('Доступ заборонено. Потрібна роль адміністратора.');
+      throw new UnauthorizedException('Доступ заборонено');
     }
 
     const tokens = await this.generateTokens(user);
