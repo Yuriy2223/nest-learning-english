@@ -122,64 +122,6 @@ export class AuthController {
   @UseGuards(GoogleAuthGuard)
   async googleAuth(): Promise<void> {}
 
-  // @Get('google/callback')
-  // @UseGuards(GoogleAuthGuard)
-  // async googleAuthCallback(@Req() req: Request, @Res() res: Response): Promise<void> {
-  //   try {
-  //     const googleUser = req.user as GoogleUser;
-  //     if (!googleUser) {
-  //       return res.redirect(`${process.env.FRONTEND_URL}/login?error=auth_failed`);
-  //     }
-
-  //     const tokens = await this.authService.googleLogin(googleUser);
-  //     this.setRefreshTokenCookie(res, tokens.refreshToken);
-
-  //     const redirectUrl = `${process.env.FRONTEND_URL}/auth/callback?token=${tokens.accessToken}`;
-  //     res.redirect(redirectUrl);
-  //   } catch (error) {
-  //     console.error('Google callback error:', error);
-  //     res.redirect(`${process.env.FRONTEND_URL}/login?error=server_error`);
-  //   }
-  // }
-
-  // @Get('google/callback')
-  // @UseGuards(GoogleAuthGuard)
-  // async googleAuthCallback(@Req() req: Request, @Res() res: Response): Promise<void> {
-  //   try {
-  //     const googleUser = req.user as GoogleUser;
-
-  //     if (!googleUser) {
-  //       const adminUrl = this.configService.get<string>('admin.url');
-  //       return res.redirect(`${adminUrl}?error=auth_failed`);
-  //     }
-
-  //     const tokens = await this.authService.googleLogin(googleUser);
-  //     this.setRefreshTokenCookie(res, tokens.refreshToken);
-  //     const adminUrl = this.configService.get<string>('admin.url');
-
-  //     res.redirect(`${adminUrl}?googleToken=${tokens.accessToken}`);
-  //   } catch (error) {
-  //     console.error('Google callback error:', error);
-  //     const adminUrl = this.configService.get<string>('admin.url');
-
-  //     let errorMessage = 'server_error';
-  //     if (error instanceof UnauthorizedException) {
-  //       const response = error.getResponse();
-  //       const message =
-  //         typeof response === 'object' && response !== null && 'message' in response
-  //           ? String(response.message)
-  //           : '';
-
-  //       if (message.includes('не знайдений')) {
-  //         errorMessage = 'user_not_found';
-  //       } else if (message.includes('адміністратора')) {
-  //         errorMessage = 'not_admin';
-  //       }
-  //     }
-
-  //     res.redirect(`${adminUrl}?error=${errorMessage}`);
-  //   }
-  // }
   @Get('google/callback')
   @UseGuards(GoogleAuthGuard)
   async googleAuthCallback(@Req() req: Request, @Res() res: Response): Promise<void> {
@@ -197,10 +139,10 @@ export class AuthController {
 
       res.redirect(`${adminUrl}/login?googleToken=${tokens.accessToken}`);
     } catch (error) {
-      console.error('Google callback error:', error);
       const adminUrl = this.configService.get<string>('admin.url');
 
       let errorMessage = 'server_error';
+
       if (error instanceof UnauthorizedException) {
         const response = error.getResponse();
         const message =
