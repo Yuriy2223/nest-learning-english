@@ -137,45 +137,7 @@ export class AuthService {
   //   await this.tokensService.saveRefreshToken(user._id.toString(), tokens.refreshToken);
   //   return tokens;
   // }
-  /************************************************************************ */
-  // async googleLogin(googleUser: GoogleUser): Promise<AuthTokens> {
-  //   const userWithState = googleUser as GoogleUser & { state?: string };
-  //   const isAdmin = userWithState.state === 'admin';
 
-  //   let user = await this.usersService.findByGoogleId(googleUser.googleId);
-
-  //   if (!user) {
-  //     user = await this.usersService.findByEmail(googleUser.email);
-
-  //     if (user) {
-  //       user = await this.usersService.updateGoogleUser(
-  //         user._id.toString(),
-  //         googleUser.googleId,
-  //         googleUser.name,
-  //         googleUser.avatar,
-  //       );
-  //     } else {
-  //       if (isAdmin) {
-  //         throw new UnauthorizedException('Користувач не знайдений. Зареєструйтесь спочатку.');
-  //       }
-
-  //       user = await this.usersService.createGoogleUser(
-  //         googleUser.email,
-  //         googleUser.googleId,
-  //         googleUser.name,
-  //         googleUser.avatar,
-  //       );
-  //     }
-  //   }
-
-  //   if (isAdmin && !user.roles.includes('admin')) {
-  //     throw new UnauthorizedException('Доступ заборонено. Потрібна роль адміністратора.');
-  //   }
-
-  //   const tokens = await this.generateTokens(user);
-  //   await this.tokensService.saveRefreshToken(user._id.toString(), tokens.refreshToken);
-  //   return tokens;
-  // }
   async googleLogin(googleUser: GoogleUser): Promise<AuthTokens> {
     const userWithState = googleUser as GoogleUser & { state?: string };
     const isAdmin = userWithState.state === 'admin';
@@ -186,7 +148,6 @@ export class AuthService {
       user = await this.usersService.findByEmail(googleUser.email);
 
       if (user) {
-        // Користувач існує, оновлюємо Google дані
         user = await this.usersService.updateGoogleUser(
           user._id.toString(),
           googleUser.googleId,
@@ -194,15 +155,10 @@ export class AuthService {
           googleUser.avatar,
         );
       } else {
-        // Новий користувач
         if (isAdmin) {
-          // КРИТИЧНО: Якщо це спроба входу в адмін-панель, НЕ створюємо користувача
-          throw new UnauthorizedException(
-            'Користувач не знайдений. Зареєструйтесь спочатку через мобільний додаток.',
-          );
+          throw new UnauthorizedException('Користувач не знайдений');
         }
 
-        // Створюємо нового користувача тільки для звичайної автентифікації
         user = await this.usersService.createGoogleUser(
           googleUser.email,
           googleUser.googleId,
@@ -212,12 +168,10 @@ export class AuthService {
       }
     }
 
-    // КРИТИЧНО: Перевіряємо роль ПЕРЕД створенням токенів
     if (isAdmin && !user.roles.includes('admin')) {
       throw new UnauthorizedException('Доступ заборонено. Потрібна роль адміністратора.');
     }
 
-    // Тільки тепер створюємо токени
     const tokens = await this.generateTokens(user);
     await this.tokensService.saveRefreshToken(user._id.toString(), tokens.refreshToken);
     return tokens;
