@@ -11,11 +11,18 @@ export interface UserDto {
   points?: number;
 }
 
+// export interface GoogleUser {
+//   googleId: string;
+//   email: string;
+//   name: string;
+//   avatar?: string;
+// }
 export interface GoogleUser {
   googleId: string;
   email: string;
   name: string;
   avatar?: string;
+  state?: string;
 }
 
 export interface UserPublicDto {
