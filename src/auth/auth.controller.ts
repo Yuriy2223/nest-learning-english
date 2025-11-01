@@ -195,7 +195,6 @@ export class AuthController {
       this.setRefreshTokenCookie(res, tokens.refreshToken);
       const adminUrl = this.configService.get<string>('admin.url');
 
-      // ЗМІНЕНО: редірект на /login з токеном замість кореня
       res.redirect(`${adminUrl}/login?googleToken=${tokens.accessToken}`);
     } catch (error) {
       console.error('Google callback error:', error);
@@ -216,7 +215,6 @@ export class AuthController {
         }
       }
 
-      // ЗМІНЕНО: редірект на /login з помилкою
       res.redirect(`${adminUrl}/login?error=${errorMessage}`);
     }
   }
