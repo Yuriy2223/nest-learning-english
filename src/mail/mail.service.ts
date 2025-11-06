@@ -276,10 +276,10 @@ export class MailService {
             <body>
               <div class="container">
                 <div class="header">
-                  <h1>✉️ Підтвердження Email</h1>
+                  <h1>Підтвердження Email</h1>
                 </div>
                 <div class="content">
-                  <p><strong>Вітаємо в Learning English! 🎉</strong></p>
+                  <p><strong>Вітаємо в Learning English!</strong></p>
                   <p>Дякуємо за реєстрацію. Будь ласка, підтвердіть вашу електронну адресу, натиснувши на кнопку нижче:</p>
                   
                   <div class="button-container">
@@ -287,7 +287,7 @@ export class MailService {
                   </div>
                   
                   <div class="info">
-                    <p><strong>ℹ️ Корисна інформація:</strong></p>
+                    <p><strong>Корисна інформація:</strong></p>
                     <ul style="margin: 10px 0; padding-left: 20px;">
                       <li>Посилання дійсне протягом <strong>24 годин</strong></li>
                       <li>Після підтвердження ви зможете увійти в систему</li>
@@ -309,5 +309,408 @@ export class MailService {
       this.logger.error(`Failed to send verification email to ${email}`, error);
       throw error;
     }
+  }
+
+  generateEmailVerificationRedirectHtml(
+    userId: string,
+    token: string,
+    isMobile: boolean,
+    verificationSuccess: boolean,
+    errorMessage: string = '',
+  ): string {
+    const deepLink = `learningenglish:///login`;
+    const frontendUrl = this.configService.get<string>('frontend.url');
+    const webUrl = `${frontendUrl}/login`;
+
+    return `
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${verificationSuccess ? 'Email підтверджено' : 'Помилка'} - Learning English</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+        background: linear-gradient(135deg, ${verificationSuccess ? '#4CAF50 0%, #45a049 100%' : '#f44336 0%, #d32f2f 100%'});
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      .container {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        max-width: 500px;
+        width: 100%;
+        padding: 40px;
+        text-align: center;
+        animation: slideIn 0.3s ease-out;
+      }
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, ${verificationSuccess ? '#4CAF50 0%, #45a049 100%' : '#f44336 0%, #d32f2f 100%'});
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 30px;
+        font-size: 40px;
+        animation: scaleIn 0.5s ease-out 0.2s both;
+      }
+      @keyframes scaleIn {
+        from {
+          transform: scale(0);
+        }
+        to {
+          transform: scale(1);
+        }
+      }
+      h1 {
+        color: #333;
+        font-size: 24px;
+        margin-bottom: 15px;
+        font-weight: 600;
+      }
+      p {
+        color: #666;
+        font-size: 16px;
+        line-height: 1.6;
+        margin-bottom: 30px;
+      }
+      .button {
+        display: block;
+        width: 100%;
+        padding: 16px;
+        background: linear-gradient(135deg, ${verificationSuccess ? '#4CAF50 0%, #45a049 100%' : '#2196F3 0%, #1976D2 100%'});
+        color: white;
+        text-decoration: none;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 16px;
+        border: none;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        margin-bottom: 15px;
+      }
+      .button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      }
+      .button:active {
+        transform: translateY(0);
+      }
+      .error-details {
+        background: #fff3cd;
+        border: 1px solid #ffc107;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+        color: #856404;
+        font-size: 14px;
+        text-align: left;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="icon">${verificationSuccess ? '✅' : '❌'}</div>
+      <h1>${verificationSuccess ? 'Email підтверджено!' : 'Помилка підтвердження'}</h1>
+      
+      ${
+        verificationSuccess
+          ? `
+        <p>Ваша електронна пошта успішно підтверджена. Тепер ви можете увійти у додаток.</p>
+        ${
+          isMobile
+            ? `
+          <button onclick="openApp()" class="button">
+            Відкрити застосунок
+          </button>
+          <a href="${webUrl}" class="button" style="background: linear-gradient(135deg, #9E9E9E 0%, #757575 100%);">
+             Відкрити веб-версію
+          </a>
+        `
+            : `
+          <a href="${webUrl}" class="button">
+             Перейти до входу
+          </a>
+        `
+        }
+      `
+          : `
+        <div class="error-details">
+          <strong>Деталі помилки:</strong><br>
+          ${errorMessage || 'Невалідне посилання або термін дії минув'}
+        </div>
+        <p>Спробуйте запросити новий лист підтвердження або зв'яжіться з підтримкою.</p>
+        <a href="${webUrl}" class="button">
+          Повернутися до входу
+        </a>
+      `
+      }
+    </div>
+
+    ${
+      verificationSuccess && isMobile
+        ? `
+    <script>
+      const deepLink = '${deepLink}';
+      const webUrl = '${webUrl}';
+      let appOpened = false;
+      
+      function openApp() {
+     
+        
+        if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+          window.location.href = deepLink;
+          
+          setTimeout(() => {
+            if (!document.hidden && !appOpened) {
+              console.log(' App not installed, redirecting to web...');
+              alert('Застосунок не встановлений. Перенаправляємо на веб-версію...');
+              window.location.href = webUrl;
+            }
+          }, 2500);
+        } else if (/Android/i.test(navigator.userAgent)) {
+          window.location.href = deepLink;
+          
+          setTimeout(() => {
+            if (!document.hidden && !appOpened) {
+              console.log(' App not installed, redirecting to web...');
+              alert('Застосунок не встановлений. Перенаправляємо на веб-версію...');
+              window.location.href = webUrl;
+            }
+          }, 2500);
+        } else {
+          console.log('Unknown device, opening web version');
+          window.location.href = webUrl;
+        }
+      }
+
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          appOpened = true;
+          }
+      });
+
+      setTimeout(() => {
+      openApp();
+      }, 1000);
+    </script>
+    `
+        : ''
+    }
+  </body>
+</html>
+`;
+  }
+
+  generateResetPasswordRedirectHtml(token: string, isMobile: boolean): string {
+    const deepLink = `learningenglish://reset-password?token=${token}`;
+    const frontendUrl = this.configService.get<string>('frontend.url');
+    const webUrl = `${frontendUrl}/reset-password?token=${token}`;
+
+    return `
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Відновлення пароля - Learning English</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      .container {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        max-width: 500px;
+        width: 100%;
+        padding: 40px;
+        text-align: center;
+      }
+      .icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 30px;
+        font-size: 40px;
+      }
+      h1 {
+        color: #333;
+        font-size: 24px;
+        margin-bottom: 15px;
+      }
+      p {
+        color: #666;
+        font-size: 16px;
+        line-height: 1.6;
+        margin-bottom: 30px;
+      }
+      .button {
+        display: block;
+        width: 100%;
+        padding: 16px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 16px;
+        border: none;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+      .button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+      }
+      .loader {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #667eea;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 20px auto;
+      }
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      .status {
+        padding: 15px;
+        border-radius: 8px;
+        margin: 20px 0;
+        font-size: 14px;
+        display: none;
+      }
+      .status-error {
+        background: #f8d7da;
+        color: #721c24;
+      }
+      @media (max-width: 480px) {
+        .container { padding: 30px 20px; }
+        h1 { font-size: 20px; }
+        p { font-size: 14px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="icon">🔐</div>
+      <h1>Відновлення пароля</h1>
+      
+      <div id="loading">
+        <div class="loader"></div>
+        <p>Відкриття застосунку...</p>
+      </div>
+
+      <div id="mobile-content" style="display: none;">
+        <p>Застосунок не відкрився автоматично?</p>
+        <button onclick="openApp()" class="button">
+          Відкрити застосунок
+        </button>
+      </div>
+
+      <div id="desktop-content" style="display: none;">
+        <p>Натисніть кнопку нижче, щоб продовжити скидання пароля</p>
+        <a href="${webUrl}" class="button">
+          Скидання паролю
+        </a>
+      </div>
+
+      <div id="status" class="status"></div>
+    </div>
+
+    <script>
+      const deepLink = '${deepLink}';
+      const webUrl = '${webUrl}';
+      const isMobile = ${isMobile};
+      let appOpened = false;
+      
+      function showStatus(message, type) {
+        const status = document.getElementById('status');
+        status.className = 'status status-' + type;
+        status.textContent = message;
+        status.style.display = 'block';
+      }
+
+      function openApp() {
+        console.log('Attempting to open deep link:', deepLink);
+        
+        if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+          window.location.href = deepLink;
+          
+          setTimeout(() => {
+            if (!document.hidden && !appOpened) {
+              showStatus('Застосунок не встановлений. Будь ласка, встановіть додаток із App Store.', 'error');
+            }
+          }, 2500);
+        } else if (/Android/i.test(navigator.userAgent)) {
+          const iframe = document.createElement('iframe');
+          iframe.style.display = 'none';
+          iframe.src = deepLink;
+          document.body.appendChild(iframe);
+          
+          setTimeout(() => {
+            document.body.removeChild(iframe);
+            if (!document.hidden && !appOpened) {
+              showStatus('Застосунок не встановлений. Будь ласка, встановіть додаток із Google Play.', 'error');
+            }
+          }, 2500);
+        }
+      }
+
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          appOpened = true;
+        }
+      });
+
+      if (isMobile) {
+        setTimeout(() => {
+          openApp();
+          
+          setTimeout(() => {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('mobile-content').style.display = 'block';
+          }, 3000);
+        }, 500);
+      } else {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('desktop-content').style.display = 'block';
+      }
+    </script>
+  </body>
+</html>
+`;
   }
 }
