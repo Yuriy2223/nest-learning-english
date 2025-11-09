@@ -22,7 +22,7 @@ export class User {
   @Prop({ type: [String], default: ['user'] })
   roles: string[];
 
-  @Prop()
+  @Prop({ unique: true, sparse: true })
   googleId?: string;
 
   @Prop({ default: false })

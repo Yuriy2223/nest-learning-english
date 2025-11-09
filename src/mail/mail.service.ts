@@ -481,23 +481,20 @@ export class MailService {
           
           setTimeout(() => {
             if (!document.hidden && !appOpened) {
-              console.log(' App not installed, redirecting to web...');
               alert('Застосунок не встановлений. Перенаправляємо на веб-версію...');
               window.location.href = webUrl;
             }
           }, 2500);
         } else if (/Android/i.test(navigator.userAgent)) {
           window.location.href = deepLink;
-          
           setTimeout(() => {
             if (!document.hidden && !appOpened) {
-              console.log(' App not installed, redirecting to web...');
+        
               alert('Застосунок не встановлений. Перенаправляємо на веб-версію...');
               window.location.href = webUrl;
             }
           }, 2500);
         } else {
-          console.log('Unknown device, opening web version');
           window.location.href = webUrl;
         }
       }
@@ -664,9 +661,7 @@ export class MailService {
       }
 
       function openApp() {
-        console.log('Attempting to open deep link:', deepLink);
-        
-        if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+          if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
           window.location.href = deepLink;
           
           setTimeout(() => {

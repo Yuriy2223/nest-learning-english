@@ -68,9 +68,17 @@ export class UsersService {
     name: string,
     avatar?: string,
   ): Promise<UserDocument> {
-    const user = await this.userModel
-      .findByIdAndUpdate(userId, { googleId, name, avatar, isEmailVerified: true }, { new: true })
-      .exec();
+    const updateData: Partial<UserDocument> = {
+      googleId,
+      name,
+      isEmailVerified: true,
+    };
+
+    if (avatar) {
+      updateData.avatar = avatar;
+    }
+
+    const user = await this.userModel.findByIdAndUpdate(userId, updateData, { new: true }).exec();
 
     if (!user) {
       throw new NotFoundException('User not found');
