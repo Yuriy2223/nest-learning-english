@@ -26,7 +26,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {
-    this.googleClient = new OAuth2Client(this.configService.get<string>('google.clientId'));
+    this.googleClient = new OAuth2Client(this.configService.get<string>('google.webClientId'));
   }
 
   async signup(signupDto: SignupDto): Promise<{ message: string }> {
@@ -114,7 +114,6 @@ export class AuthService {
   async googleLogin(googleUser: GoogleUser): Promise<AuthTokens> {
     const userWithState = googleUser as GoogleUser & { state?: string };
     const isAdmin = userWithState.state === 'admin';
-
     let user = await this.usersService.findByGoogleId(googleUser.googleId);
 
     if (!user) {
@@ -128,10 +127,6 @@ export class AuthService {
           googleUser.avatar,
         );
       } else {
-        if (isAdmin) {
-          throw new UnauthorizedException('Користувач не знайдений');
-        }
-
         user = await this.usersService.createGoogleUser(
           googleUser.email,
           googleUser.googleId,
@@ -147,6 +142,7 @@ export class AuthService {
 
     const tokens = await this.generateTokens(user);
     await this.tokensService.saveRefreshToken(user._id.toString(), tokens.refreshToken);
+
     return tokens;
   }
 
@@ -235,16 +231,6 @@ export class AuthService {
       console.error('Google token verification error:', error);
       throw new UnauthorizedException('Failed to verify Google token');
     }
-  }
-
-  async getUserByEmail(email: string): Promise<UserDocument> {
-    const user = await this.usersService.findByEmail(email);
-
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
-    return user;
   }
 
   private async generateTokens(user: UserDocument): Promise<AuthTokens> {

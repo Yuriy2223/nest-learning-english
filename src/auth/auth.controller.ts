@@ -10,7 +10,9 @@ import {
   HttpStatus,
   Query,
   UnauthorizedException,
+  NotFoundException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import type { Response, Request } from 'express';
 import { AuthService } from './auth.service';
 import { MailService } from '../mail/mail.service';
@@ -23,6 +25,7 @@ import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { AuthGuard } from '@nestjs/passport';
+import { UsersService } from 'src/user/user.service';
 import { UserDocument } from 'src/user/schemas/user.schema';
 import { GoogleUser } from 'src/user/interfaces/user.interface';
 import { GoogleIdTokenDto } from './dto/google-id-token.dto';
@@ -31,7 +34,6 @@ import type {
   JwtRefreshValidatedUser,
   SigninResponse,
 } from './interfaces/auth.interface';
-import { ConfigService } from '@nestjs/config';
 
 @Controller('auth')
 export class AuthController {
@@ -39,6 +41,7 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly mailService: MailService,
     private readonly configService: ConfigService,
+    private readonly usersService: UsersService,
   ) {}
 
   private isMobileApp(req: Request): boolean {
@@ -209,7 +212,11 @@ export class AuthController {
     const googleUser = await this.authService.verifyGoogleToken(googleIdTokenDto.idToken);
     const tokens = await this.authService.googleLogin(googleUser);
     const isMobile = this.isMobileApp(req);
-    const user = await this.authService.getUserByEmail(googleUser.email);
+    const user = await this.usersService.findByEmail(googleUser.email);
+
+    if (!user) {
+      throw new NotFoundException('User not found after Google login');
+    }
 
     if (!isMobile) {
       this.setRefreshTokenCookie(res, tokens.refreshToken);
@@ -302,7 +309,6 @@ export class AuthController {
   resetRedirect(@Query('token') token: string, @Req() req: Request, @Res() res: Response): void {
     const userAgent = req.headers['user-agent'] || '';
     const isMobile = /Mobile|Android|iPhone|iPad/i.test(userAgent);
-
     const html = this.mailService.generateResetPasswordRedirectHtml(token, isMobile);
 
     res.setHeader('Content-Type', 'text/html');
