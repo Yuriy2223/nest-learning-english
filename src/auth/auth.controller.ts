@@ -174,11 +174,21 @@ export class AuthController {
         return res.redirect(`${adminUrl}/login?error=auth_failed`);
       }
 
+      const userWithState = googleUser as GoogleUser & { state?: string };
+      const isAdmin = userWithState.state === 'admin';
       const tokens = await this.authService.googleLogin(googleUser);
-      this.setRefreshTokenCookie(res, tokens.refreshToken);
       const adminUrl = this.configService.get<string>('admin.url');
 
-      res.redirect(`${adminUrl}/login?googleToken=${tokens.accessToken}`);
+      if (isAdmin) {
+        const encodedAccess = encodeURIComponent(tokens.accessToken);
+        const encodedRefresh = encodeURIComponent(tokens.refreshToken);
+        return res.redirect(
+          `${adminUrl}/login?googleToken=${encodedAccess}&refreshToken=${encodedRefresh}`,
+        );
+      } else {
+        this.setRefreshTokenCookie(res, tokens.refreshToken);
+        res.redirect(`${adminUrl}/login?googleToken=${tokens.accessToken}`);
+      }
     } catch (error) {
       const adminUrl = this.configService.get<string>('admin.url');
 
@@ -193,7 +203,7 @@ export class AuthController {
 
         if (message.includes('не знайдений')) {
           errorMessage = 'user_not_found';
-        } else if (message.includes('адміністратора')) {
+        } else if (message.includes('адміністратора') || message.includes('Доступ заборонено')) {
           errorMessage = 'not_admin';
         }
       }
