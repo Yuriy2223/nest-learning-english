@@ -114,6 +114,7 @@ export class AuthService {
   async googleLogin(googleUser: GoogleUser): Promise<AuthTokens> {
     const userWithState = googleUser as GoogleUser & { state?: string };
     const isAdmin = userWithState.state === 'admin';
+
     let user = await this.usersService.findByGoogleId(googleUser.googleId);
 
     if (!user) {
@@ -127,6 +128,10 @@ export class AuthService {
           googleUser.avatar,
         );
       } else {
+        if (isAdmin) {
+          throw new UnauthorizedException('Користувача не знайдено.');
+        }
+
         user = await this.usersService.createGoogleUser(
           googleUser.email,
           googleUser.googleId,
@@ -137,7 +142,7 @@ export class AuthService {
     }
 
     if (isAdmin && !user.roles.includes('admin')) {
-      throw new UnauthorizedException('Доступ заборонено');
+      throw new UnauthorizedException('Доступ тільки для адміністратора.');
     }
 
     const tokens = await this.generateTokens(user);
