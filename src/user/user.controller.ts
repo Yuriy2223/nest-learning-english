@@ -47,6 +47,13 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
+  @Get('progress')
+  @UseGuards(JwtAuthGuard)
+  async getUserProgress(@CurrentUser() user: UserDto) {
+    await this.usersService.updateStreak(user.id);
+    return this.achievementsService.calculateUserStats(user.id);
+  }
+
   @Get(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
@@ -84,13 +91,6 @@ export class UsersController {
       success: true,
       totalStudySeconds: updatedUser.totalStudySeconds,
     };
-  }
-
-  @Get('progress')
-  @UseGuards(JwtAuthGuard)
-  async getUserProgress(@CurrentUser() user: UserDto) {
-    await this.usersService.updateStreak(user.id);
-    return this.achievementsService.calculateUserStats(user.id);
   }
 
   @Delete('progress/reset')
